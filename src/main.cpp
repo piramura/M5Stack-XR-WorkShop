@@ -17,6 +17,7 @@ static void drawStatus(const char* text) {
 
 void setup() {
   M5.begin();
+  Serial.begin(115200);
   M5.Display.setRotation(1);
 
   w = M5.Display.width();
@@ -25,6 +26,7 @@ void setup() {
   M5.Display.fillScreen(WHITE);
   M5.Display.setTextDatum(top_center);
   drawStatus("Touch Ready");
+  Serial.println("Touch demo ready");
 
   const int buttonSize = 200;
   button.initButton(&M5.Display, w / 2, h / 2, buttonSize, buttonSize, TFT_BLUE, TFT_YELLOW, TFT_BLACK, "BTN", 4, 4);
@@ -38,6 +40,7 @@ void loop() {
   const bool pressed = touchDetail.isPressed() && button.contains(touchDetail.x, touchDetail.y);
   if (pressed != lastPressed) {
     lastPressed = pressed;
+    Serial.printf("touch %s x=%d y=%d\n", pressed ? "pressed" : "released", touchDetail.x, touchDetail.y);
     drawStatus(pressed ? "Button Pressed" : "Button Released");
   }
 }
