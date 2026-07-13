@@ -1,3 +1,4 @@
+#include <FastLED.h>
 #include <M5GFX.h>
 #include <M5Unified.h>
 
@@ -17,6 +18,22 @@ static int32_t screenHeight;
 static bool lastPressed = false;
 
 LGFX_Button button;
+
+static constexpr size_t LED_COUNT = 29;
+static constexpr uint8_t LED_BRIGHTNESS = 32;
+
+#if defined(ARDUINO_M5STACK_CORES3)
+static constexpr uint8_t LED_DATA_PIN = 2;
+#else
+static constexpr uint8_t LED_DATA_PIN = 32;
+#endif
+
+static CRGB leds[LED_COUNT];
+
+static void showLedColor(const CRGB& color) {
+  fill_solid(leds, LED_COUNT, color);
+  FastLED.show();
+}
 
 #ifdef ENABLE_OSC
 static WiFiUDP oscUdp;
@@ -82,6 +99,11 @@ void setup() {
                     TFT_BLACK, "BTN", 4, 4);
   button.drawButton();
 
+  FastLED.addLeds<SK6812, LED_DATA_PIN, GRB>(leds, LED_COUNT);
+  FastLED.setBrightness(LED_BRIGHTNESS);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 300);
+  showLedColor(CRGB::Black);
+
 #ifdef ENABLE_OSC
   connectWiFi();
 #endif
@@ -96,6 +118,7 @@ void loop() {
   if (pressed != lastPressed) {
     lastPressed = pressed;
     drawStatus(pressed ? "Button Pressed" : "Button Released");
+    showLedColor(pressed ? CRGB::Blue : CRGB::Black);
     Serial.printf("touch %s x=%d y=%d\n",
                   pressed ? "pressed" : "released", touch.x, touch.y);
 
