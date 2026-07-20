@@ -3,7 +3,7 @@
 #include <M5Unified.h>
 
 // 次の行のコメントを外すと、タッチイベントをUnityへOSC送信します。
-#define ENABLE_OSC
+// #define ENABLE_OSC
 
 #ifdef ENABLE_OSC
 #include <OSCMessage.h>
