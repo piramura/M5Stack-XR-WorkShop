@@ -57,9 +57,9 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
 
 ### ビルド対象の選択
 
-![ステータスバーに表示されたビルド対象環境名](images/statusbar/env_statusbar.png)
-
 ![ビルド対象環境を選択するクイックピック](images/statusbar/env_picker.png)
+
+![ステータスバーに表示されたビルド対象環境名](images/statusbar/env_statusbar.png)
 
 ![ステータスバーのBuild、Upload、Cleanアイコン](images/statusbar/build_upload_clean.png)
 
