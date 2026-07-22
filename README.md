@@ -115,19 +115,32 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
    Copy-Item include/wifi_config.example.h include/wifi_config.h
    ```
 
-2. `include/wifi_config.h`を開き、次の4項目を編集します。
+2. `include/wifi_config.h`を開き、Wi-Fi情報とOSC送信先を編集します。
 
    ```cpp
    static constexpr const char* WIFI_SSID = "YOUR_WIFI_SSID";
    static constexpr const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
-   static constexpr const char* UNITY_OSC_HOST = "192.168.0.10";
+
+   struct OscDestination {
+     const char* name;
+     const char* host;
+   };
+
+   static constexpr OscDestination OSC_DESTINATIONS[] = {
+       {"PC A", "192.168.0.10"},
+       {"PC B", "192.168.0.11"},
+       {"PC C", "192.168.0.12"},
+   };
+
    static constexpr uint16_t UNITY_OSC_PORT = 9000;
    ```
 
    - `WIFI_SSID`：M5Stackを接続するWi-Fi名
    - `WIFI_PASSWORD`：Wi-Fiのパスワード
-   - `UNITY_OSC_HOST`：Unityを実行するPCのIPv4アドレス
+   - `OSC_DESTINATIONS`：画面に表示する名前とUnityを実行する端末のIPv4アドレス
    - `UNITY_OSC_PORT`：Unity側のOSC受信ポート
+
+   送信先は1〜3件設定できます。使用しない送信先は、その行を`//`でコメントアウトしてください。
 
    `UNITY_OSC_PORT`は、Unity側で設定した受信ポートと同じ番号にしてください。PCのIPアドレスは[ネットワーク設定手順](docs/network-setup.md)で確認できます。
 
@@ -150,3 +163,5 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
 5. 使用する環境の「General」→「Build」を実行し、`[SUCCESS]`になることを確認します。
 
 6. 「General」→「Upload」を実行し、M5Stackへ書き込みます。
+
+7. 起動後に送信先を選択します。操作画面の「Target」を押すと送信先を変更できます。

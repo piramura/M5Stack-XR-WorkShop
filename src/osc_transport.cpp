@@ -12,16 +12,25 @@
 namespace {
 constexpr char IMU_OSC_PATH[] = "/m5/imu";
 constexpr uint32_t IMU_SEND_INTERVAL_MS = 1000 / 30;
+constexpr size_t OSC_DESTINATION_COUNT =
+    sizeof(OSC_DESTINATIONS) / sizeof(OSC_DESTINATIONS[0]);
+static_assert(OSC_DESTINATION_COUNT >= 1,
+              "At least one OSC destination is required");
+static_assert(OSC_DESTINATION_COUNT <= 3,
+              "Up to three OSC destinations are supported");
 
 WiFiUDP oscUdp;
 uint32_t lastImuSentAt = 0;
+size_t selectedDestinationIndex = 0;
+bool destinationSelected = false;
 
 bool isWiFiConnected() {
   return WiFi.status() == WL_CONNECTED;
 }
 
 void sendMessage(OSCMessage& message) {
-  oscUdp.beginPacket(UNITY_OSC_HOST, UNITY_OSC_PORT);
+  oscUdp.beginPacket(OSC_DESTINATIONS[selectedDestinationIndex].host,
+                     UNITY_OSC_PORT);
   message.send(oscUdp);
   oscUdp.endPacket();
 }
@@ -49,10 +58,62 @@ void initializeOscTransport() {
 #endif
 }
 
+bool isOscEnabled() {
+#ifdef ENABLE_OSC
+  return true;
+#else
+  return false;
+#endif
+}
+
+size_t getOscDestinationCount() {
+#ifdef ENABLE_OSC
+  return OSC_DESTINATION_COUNT;
+#else
+  return 0;
+#endif
+}
+
+const char* getOscDestinationName(size_t index) {
+#ifdef ENABLE_OSC
+  if (index < OSC_DESTINATION_COUNT) {
+    return OSC_DESTINATIONS[index].name;
+  }
+#else
+  (void)index;
+#endif
+  return "";
+}
+
+void selectOscDestination(size_t index) {
+#ifdef ENABLE_OSC
+  if (index >= OSC_DESTINATION_COUNT) {
+    return;
+  }
+
+  selectedDestinationIndex = index;
+  destinationSelected = true;
+  Serial.printf("OSC target selected: %s (%s)\n",
+                OSC_DESTINATIONS[index].name, OSC_DESTINATIONS[index].host);
+#else
+  (void)index;
+#endif
+}
+
+void clearOscDestinationSelection() {
+#ifdef ENABLE_OSC
+  destinationSelected = false;
+#endif
+}
+
 void sendTouchEvent(bool pressed, int32_t x, int32_t y) {
 #ifdef ENABLE_OSC
   if (!isWiFiConnected()) {
     Serial.println("OSC skipped: WiFi not connected");
+    return;
+  }
+  if (!destinationSelected) {
+    Serial.println("OSC skipped: target not selected");
     return;
   }
 
@@ -61,7 +122,8 @@ void sendTouchEvent(bool pressed, int32_t x, int32_t y) {
   message.add(x);
   message.add(y);
   sendMessage(message);
-  Serial.printf("OSC sent: %s pressed=%d x=%d y=%d\n",
+  Serial.printf("OSC sent: target=%s path=%s pressed=%d x=%d y=%d\n",
+                OSC_DESTINATIONS[selectedDestinationIndex].name,
                 UNITY_TOUCH_OSC_PATH, pressed ? 1 : 0, x, y);
 #else
   (void)pressed;
@@ -78,7 +140,7 @@ void sendImuData(float w, float x, float y, float z) {
   }
   lastImuSentAt = now;
 
-  if (!isWiFiConnected()) {
+  if (!isWiFiConnected() || !destinationSelected) {
     return;
   }
 

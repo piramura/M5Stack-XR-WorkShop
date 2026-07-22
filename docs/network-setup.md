@@ -42,10 +42,14 @@ ipconfig
 
 ## M5Stackの送信先を設定する
 
-確認したIPv4アドレス全体を`include/wifi_config.h`の`UNITY_OSC_HOST`へ設定します。
+確認したIPv4アドレス全体を`include/wifi_config.h`の`OSC_DESTINATIONS`へ設定します。
 
 ```cpp
-static constexpr const char* UNITY_OSC_HOST = "172.16.80.100";
+static constexpr OscDestination OSC_DESTINATIONS[] = {
+    {"PC A", "172.16.80.100"},
+    {"PC B", "172.16.80.101"},
+    // {"PC C", "172.16.80.102"},
+};
 ```
 
-IPアドレスの末尾だけでなく、表示されたアドレス全体を入力してください。
+左側の名前はM5Stackの選択画面に表示されます。使用しない行はコメントアウトできます。IPアドレスの末尾だけでなく、表示されたアドレス全体を入力してください。

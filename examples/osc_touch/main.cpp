@@ -38,7 +38,7 @@ static void sendTouchEvent(bool pressed, int32_t x, int32_t y) {
   message.add(x);
   message.add(y);
 
-  oscUdp.beginPacket(UNITY_OSC_HOST, UNITY_OSC_PORT);
+  oscUdp.beginPacket(OSC_DESTINATIONS[0].host, UNITY_OSC_PORT);
   message.send(oscUdp);
   oscUdp.endPacket();
   Serial.printf("OSC sent: %s pressed=%d x=%d y=%d\n", UNITY_TOUCH_OSC_PATH, pressed ? 1 : 0, x, y);
