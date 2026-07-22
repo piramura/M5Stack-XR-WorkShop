@@ -7,44 +7,45 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
 - M5Stack Core2：ビルド・動作確認済み
 - M5Stack CoreS3：ビルド対応済み・動作検証中
 
+## 前提環境
+
+- [Git](https://git-scm.com/downloads)
+- [Visual Studio Code](https://code.visualstudio.com/download)
+- データ通信対応のUSBケーブル
+- インターネット接続
+
 ## 事前準備
 
-イベント当日までに、以下の手順で初回ビルドまで完了してください。初回ビルドではOSCが無効になっているため、Wi-Fi設定は不要です。
+イベント当日までに、PlatformIO IDEの導入と初回ビルドを完了してください。初回ビルドではOSCが無効になっているため、Wi-Fi設定は不要です。
 
-1. [Git](https://git-scm.com/downloads)をインストールします。
+### PlatformIO IDEの導入
 
-   インストール後、ターミナルで次のコマンドを実行し、バージョンが表示されることを確認します。
+1. Visual Studio Codeを起動し、左側の「拡張機能」アイコンを開きます。
 
-   ```bash
-   git --version
-   ```
+2. `PlatformIO IDE`を検索してインストールします。
 
-2. [Visual Studio Code](https://code.visualstudio.com/download)をインストールします。
+3. 再起動を求められた場合は、Visual Studio Codeを再起動します。
 
-3. Visual Studio Codeを起動し、左側の「拡張機能」アイコンを開きます。
+### プロジェクトの準備
 
-4. `PlatformIO IDE`を検索してインストールします。
-
-   インストール後に再起動を求められた場合は、Visual Studio Codeを再起動します。
-
-5. ターミナルを開き、次のコマンドでこのリポジトリをcloneします。
+1. ターミナルを開き、次のコマンドでこのリポジトリをcloneします。
 
    ```bash
    git clone https://github.com/piramura/M5Stack-XR-WorkShop.git
    cd M5Stack-XR-WorkShop
    ```
 
-6. Visual Studio Codeの「ファイル」→「フォルダーを開く」を選択し、cloneした`M5Stack-XR-WorkShop`フォルダを開きます。
+2. Visual Studio Codeの「ファイル」→「フォルダーを開く」を選択し、cloneした`M5Stack-XR-WorkShop`フォルダを開きます。
 
    `platformio.ini`がVisual Studio Codeのファイル一覧の直下に表示されていることを確認してください。
 
-7. PlatformIOの初期化とライブラリの自動インストールが終わるまで待ちます。
+3. PlatformIOの初期化とライブラリの自動インストールが終わるまで待ちます。
 
    初回はダウンロードに数分かかることがあります。インターネットへ接続した状態で実行してください。
 
-8. 左側のPlatformIOアイコンを開き、「PROJECT TASKS」→「m5stack-core2」→「General」→「Build」を実行します。
+4. 画面下部のステータスバーにある✓（Build）アイコンをクリックします。
 
-9. ターミナルの最後に次の表示が出れば、事前準備は完了です。
+5. ターミナルの最後に次の表示が出れば、事前準備は完了です。
 
    ```text
    [SUCCESS]
@@ -56,21 +57,27 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
 
 ### ビルド対象の選択
 
-1. Core2を使用する場合は「PROJECT TASKS」→「m5stack-core2」を選択します。
+![ステータスバーに表示されたビルド対象環境名](images/statusbar/env_statusbar.png)
 
-   Core2はデフォルトのビルド対象に設定されています。
+![ビルド対象環境を選択するクイックピック](images/statusbar/env_picker.png)
 
-2. CoreS3を使用する場合は「PROJECT TASKS」→「m5stack-cores3」を選択します。
+![ステータスバーのBuild、Upload、Cleanアイコン](images/statusbar/build_upload_clean.png)
+
+1. Core2を使用する場合は、ステータスバーの環境名をクリックし、`env:m5stack-core2`を選択します。
+
+   `Default`は`platformio.ini`の`default_envs`を使用します。現在はCore2がデフォルトのビルド対象です。
+
+2. CoreS3を使用する場合は、ステータスバーの環境名をクリックし、`env:m5stack-cores3`を選択します。
 
    CoreS3はビルド対応済みですが、実機動作は検証中です。
 
-3. 選択した環境の「General」→「Build」を実行し、`[SUCCESS]`になることを確認します。
+3. ステータスバーの✓（Build）アイコンをクリックし、`[SUCCESS]`になることを確認します。
 
 ### M5StackへのUpload
 
 1. M5Stackをデータ通信対応のUSBケーブルでPCへ接続します。
 
-2. 使用する環境の「General」→「Upload」を実行します。
+2. 「ビルド対象の選択」に掲載したステータスバー画像の→（Upload）アイコンをクリックします。
 
 3. シリアルポートの選択画面が表示された場合は、M5Stackを接続したポートを選択します。
 
@@ -85,15 +92,19 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
 
 1. M5StackとLEDテープの電源を切ります。
 
-2. LEDテープの入力側を確認します。`DIN`表記または矢印の始点側が入力です。
+2. LEDテープの入力側コネクタを確認します。`DIN`表記または矢印の始点側が入力です。
 
-3. LEDテープを次のように接続します。
+   ![LEDテープ入力側のコネクタ](images/led_wiring/connector.jpg)
+
+3. LEDテープ入力側のコネクタを、M5Stack本体のPort Aへ差し込みます。配線はPort Aへの接続だけで完了します。
 
    | SK6812 | Core2 | CoreS3 |
    | --- | --- | --- |
    | `DIN` | GPIO32 | GPIO2 |
    | `5V` | 5V | 5V |
    | `GND` | GND | GND |
+
+   ![M5Stack本体のPort Aの位置](images/led_wiring/port_a_location.jpg)
 
 4. `5V`と`GND`を逆に接続していないことを確認してから電源を入れます。
 
@@ -160,8 +171,8 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
    #define ENABLE_OSC
    ```
 
-5. 使用する環境の「General」→「Build」を実行し、`[SUCCESS]`になることを確認します。
+5. ステータスバーの✓（Build）アイコンをクリックし、`[SUCCESS]`になることを確認します。
 
-6. 「General」→「Upload」を実行し、M5Stackへ書き込みます。
+6. ステータスバーの→（Upload）アイコンをクリックし、M5Stackへ書き込みます。
 
 7. 起動後に送信先を選択します。操作画面の「Target」を押すと送信先を変更できます。
