@@ -4,7 +4,7 @@
 #include <cstdint>
 
 // 次の行をコメントアウトすると、OSC送信とWi-Fi接続を無効化します。
-#define ENABLE_OSC
+// #define ENABLE_OSC
 
 void initializeOscTransport();
 bool isOscEnabled();
