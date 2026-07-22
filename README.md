@@ -55,6 +55,8 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
    [SUCCESS]
    ```
 
+   ![PlatformIOのビルド成功画面](images/SUCCES.png)
+
 ## 当日
 
 以下は、作業中に詰まった場合の確認用です。
