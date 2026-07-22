@@ -24,6 +24,8 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
 
 2. `PlatformIO IDE`を検索してインストールします。
 
+   ![Visual Studio CodeでPlatformIO IDEを検索した画面](images/platformIO.png)
+
 3. 再起動を求められた場合は、Visual Studio Codeを再起動します。
 
 ### プロジェクトの準備
@@ -44,6 +46,8 @@ M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッ
    初回はダウンロードに数分かかることがあります。インターネットへ接続した状態で実行してください。
 
 4. 画面下部のステータスバーにある✓（Build）アイコンをクリックします。
+
+   ![Visual Studio CodeのステータスバーにあるBuildとUploadボタン](images/PlatformIOscreen.png)
 
 5. ターミナルの最後に次の表示が出れば、事前準備は完了です。
 
