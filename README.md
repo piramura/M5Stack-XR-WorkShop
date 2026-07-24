@@ -2,6 +2,8 @@
 
 M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッチイベントとIMUの姿勢データ（クォータニオン）をUnityへOSC送信するワークショップ用プロジェクトです。
 
+Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piramura/M5Stack-XR-WorkShop-Unity)
+
 対応状況:
 
 - M5Stack Core2：ビルド・動作確認済み
