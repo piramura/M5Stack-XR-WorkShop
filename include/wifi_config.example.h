@@ -1,3 +1,4 @@
+#include <cstdint>
 #pragma once
 
 // Copy this file to wifi_config.h and edit the values for your network and Unity targets.
