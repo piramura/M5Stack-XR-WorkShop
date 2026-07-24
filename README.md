@@ -1,6 +1,6 @@
 # M5Stack XR Workshop
 
-M5Stackのタッチ入力に合わせてSK6812 LEDテープを点灯し、タッチイベントとIMUの姿勢データ（クォータニオン）をUnityへOSC送信するワークショップ用プロジェクトです。
+M5Stackのタッチまたは物理ボタン入力に合わせてSK6812 LEDテープを点灯し、入力イベントとIMUの姿勢データ（クォータニオン）をUnityへOSC送信するワークショップ用プロジェクトです。
 
 Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piramura/M5Stack-XR-WorkShop-Unity)
 
@@ -8,6 +8,7 @@ Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piram
 
 - M5Stack Core2：ビルド・動作確認済み
 - M5Stack CoreS3：ビルド対応済み・動作検証中
+- M5StickS3：ビルド対応済み・動作検証中
 
 ## 前提環境
 
@@ -71,6 +72,8 @@ Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piram
 
 ![ステータスバーのBuild、Upload、Cleanアイコン](images/statusbar/build_upload_clean.png)
 
+> StickS3環境を追加した後は、環境選択の一覧に`env:m5stack-sticks3`も表示されます。
+
 1. Core2を使用する場合は、ステータスバーの環境名をクリックし、`env:m5stack-core2`を選択します。
 
    `Default`は`platformio.ini`の`default_envs`を使用します。現在はCore2がデフォルトのビルド対象です。
@@ -79,7 +82,11 @@ Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piram
 
    CoreS3はビルド対応済みですが、実機動作は検証中です。
 
-3. ステータスバーの✓（Build）アイコンをクリックし、`[SUCCESS]`になることを確認します。
+3. StickS3を使用する場合は、ステータスバーの環境名をクリックし、`env:m5stack-sticks3`を選択します。
+
+   StickS3はビルド対応済みですが、実機動作は検証中です。
+
+4. ステータスバーの✓（Build）アイコンをクリックし、`[SUCCESS]`になることを確認します。
 
 ### M5StackへのUpload
 
@@ -94,6 +101,8 @@ Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piram
 
 4. ポートが分からない場合は、一度M5Stackを外し、再接続したときに追加されたポートを選択します。
 
+   StickS3でUploadできない場合は、本体側面のリセットボタンを内蔵LEDが緑色に点滅するまで長押しし、再度Uploadします。
+
 5. ターミナルの最後に`[SUCCESS]`と表示されたことを確認します。
 
 ### SK6812 LEDテープの配線
@@ -106,17 +115,19 @@ Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piram
 
 3. LEDテープ入力側のコネクタを、M5Stack本体のPort Aへ差し込みます。配線はPort Aへの接続だけで完了します。
 
-   | SK6812 | Core2 | CoreS3 |
-   | --- | --- | --- |
-   | `DIN` | GPIO32 | GPIO2 |
-   | `5V` | 5V | 5V |
-   | `GND` | GND | GND |
+   | SK6812 | Core2 | CoreS3 | StickS3 |
+   | --- | --- | --- | --- |
+   | `DIN` | GPIO32 | GPIO2 | GPIO9 |
+   | `5V` | 5V | 5V | 5V |
+   | `GND` | GND | GND | GND |
+
+   StickS3では、プログラムの起動時にPort Aの5V出力を有効にします。
 
    ![M5Stack本体のPort Aの位置](images/led_wiring/port_a_location.jpg)
 
 4. `5V`と`GND`を逆に接続していないことを確認してから電源を入れます。
 
-5. Upload後、画面中央のボタンをタッチし、LEDテープが青く点灯することを確認します。
+5. Upload後、Core2/CoreS3は画面中央のボタンをタッチし、StickS3はボタンAを押して、LEDテープが青く点灯することを確認します。
 
 ### Wi-FiとOSCの設定
 
@@ -183,4 +194,7 @@ Unity側プロジェクト: [M5Stack-XR-WorkShop-Unity](https://github.com/piram
 
 6. ステータスバーの→（Upload）アイコンをクリックし、M5Stackへ書き込みます。
 
-7. 起動後に送信先を選択します。操作画面の「Target」を押すと送信先を変更できます。
+7. 起動後に送信先を選択します。
+
+   - Core2/CoreS3：画面の送信先をタッチして決定し、操作画面の「Target」で変更します。
+   - StickS3：ボタンBで送信先を切り替え、ボタンAで決定します。操作画面ではボタンAで送信し、ボタンBで送信先選択へ戻ります。

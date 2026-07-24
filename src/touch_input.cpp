@@ -26,6 +26,113 @@ LGFX_Button button;
 LGFX_Button destinationButtons[MAX_DESTINATION_COUNT];
 LGFX_Button changeDestinationButton;
 
+#if defined(WORKSHOP_M5STICKS3)
+constexpr int32_t PHYSICAL_BUTTON_X = 0;
+constexpr int32_t PHYSICAL_BUTTON_Y = 0;
+
+void drawStickDestinationSelection() {
+  M5.Display.fillScreen(WHITE);
+  M5.Display.setTextColor(TFT_BLACK, TFT_WHITE);
+  M5.Display.setTextDatum(top_center);
+  M5.Display.drawString("Select Target", screenWidth / 2, 8,
+                        &fonts::FreeMonoBold9pt7b);
+  M5.Display.drawString(getOscDestinationName(selectedDestinationIndex),
+                        screenWidth / 2, 47,
+                        &fonts::FreeMonoBold12pt7b);
+  M5.Display.drawString("A: OK  B: Next", screenWidth / 2, 105,
+                        &fonts::FreeMono9pt7b);
+}
+
+void drawStickControlStatus(const char* state) {
+  constexpr int statusHeight = 38;
+  char text[40];
+  if (isOscEnabled()) {
+    snprintf(text, sizeof(text), "%s: %s",
+             getOscDestinationName(selectedDestinationIndex), state);
+  } else {
+    snprintf(text, sizeof(text), "Button: %s", state);
+  }
+
+  M5.Display.fillRect(0, 0, screenWidth, statusHeight, WHITE);
+  M5.Display.setTextDatum(top_center);
+  M5.Display.setTextColor(TFT_BLACK, TFT_WHITE);
+  M5.Display.drawString(text, screenWidth / 2, 8,
+                        &fonts::FreeMonoBold9pt7b);
+}
+
+void drawStickControlScreen() {
+  M5.Display.fillScreen(WHITE);
+  drawStickControlStatus("Ready");
+  M5.Display.setTextDatum(top_center);
+  M5.Display.drawString("A: SEND", screenWidth / 2, 52,
+                        &fonts::FreeMonoBold12pt7b);
+  if (isOscEnabled()) {
+    M5.Display.drawString("B: Target", screenWidth / 2, 105,
+                          &fonts::FreeMono9pt7b);
+  }
+}
+
+TouchEvent updateStickControlButton() {
+  const bool pressed = M5.BtnA.isPressed();
+  const bool changed = pressed != lastPressed;
+
+  if (changed) {
+    lastPressed = pressed;
+    drawStickControlStatus(pressed ? "Pressed" : "Ready");
+    Serial.printf("button A %s\n", pressed ? "pressed" : "released");
+  }
+
+  return {changed, pressed, PHYSICAL_BUTTON_X, PHYSICAL_BUTTON_Y};
+}
+
+TouchEvent updateStickInput() {
+  if (clearSelectionOnNextUpdate) {
+    clearSelectionOnNextUpdate = false;
+    clearOscDestinationSelection();
+  }
+
+  if (waitForTouchRelease) {
+    if (!M5.BtnA.isPressed() && !M5.BtnB.isPressed()) {
+      waitForTouchRelease = false;
+      lastPressed = false;
+    }
+    return {false, false, PHYSICAL_BUTTON_X, PHYSICAL_BUTTON_Y};
+  }
+
+  if (screenMode == ScreenMode::DestinationSelection) {
+    if (M5.BtnB.wasPressed()) {
+      selectedDestinationIndex =
+          (selectedDestinationIndex + 1) % getOscDestinationCount();
+      drawStickDestinationSelection();
+    } else if (M5.BtnA.wasPressed()) {
+      selectOscDestination(selectedDestinationIndex);
+      screenMode = ScreenMode::Control;
+      waitForTouchRelease = true;
+      drawStickControlScreen();
+    }
+    return {false, false, PHYSICAL_BUTTON_X, PHYSICAL_BUTTON_Y};
+  }
+
+  if (isOscEnabled() && M5.BtnB.wasPressed()) {
+    const bool releaseNeeded = lastPressed;
+    lastPressed = false;
+    screenMode = ScreenMode::DestinationSelection;
+    waitForTouchRelease = true;
+    drawStickDestinationSelection();
+
+    if (releaseNeeded) {
+      clearSelectionOnNextUpdate = true;
+      return {true, false, PHYSICAL_BUTTON_X, PHYSICAL_BUTTON_Y};
+    }
+
+    clearOscDestinationSelection();
+    return {false, false, PHYSICAL_BUTTON_X, PHYSICAL_BUTTON_Y};
+  }
+
+  return updateStickControlButton();
+}
+#endif
+
 void drawStatus(const char* text) {
   constexpr int statusAreaHeight = 72;
   constexpr int textY = 10;
@@ -114,6 +221,18 @@ void initializeTouchInput() {
   screenWidth = M5.Display.width();
   screenHeight = M5.Display.height();
 
+#if defined(WORKSHOP_M5STICKS3)
+  if (isOscEnabled()) {
+    clearOscDestinationSelection();
+    screenMode = ScreenMode::DestinationSelection;
+    drawStickDestinationSelection();
+  } else {
+    screenMode = ScreenMode::Control;
+    drawStickControlScreen();
+  }
+  return;
+#endif
+
   if (isOscEnabled()) {
     clearOscDestinationSelection();
     screenMode = ScreenMode::DestinationSelection;
@@ -133,6 +252,9 @@ void initializeTouchInput() {
 }
 
 TouchEvent updateTouchInput() {
+#if defined(WORKSHOP_M5STICKS3)
+  return updateStickInput();
+#else
   const auto touch = M5.Touch.getDetail();
 
   if (!isOscEnabled()) {
@@ -187,4 +309,5 @@ TouchEvent updateTouchInput() {
   }
 
   return updateControlTouch(touch.x, touch.y, touch.isPressed());
+#endif
 }
